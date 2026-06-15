@@ -1,7 +1,7 @@
 import { Controller, Get } from '@nestjs/common';
 import { Public } from '../auth/public.decorator.js';
 import { eq, asc } from 'drizzle-orm';
-import { getDb, tournaments, teams, matches } from '@soccerx/db';
+import { getDb, tournaments, teams, matches, groups } from '@soccerx/db';
 
 var DEFAULT_SLUG = 'wc2026';
 
@@ -22,6 +22,15 @@ export class TournamentsController {
     var tournament = await db.select().from(tournaments).where(eq(tournaments.slug, DEFAULT_SLUG)).limit(1);
     if (!tournament[0]) return [];
     return db.select().from(teams).where(eq(teams.tournamentId, tournament[0].id)).orderBy(asc(teams.name));
+  }
+
+  @Public()
+  @Get('default/groups')
+  async listGroups() {
+    var db = getDb();
+    var tournament = await db.select().from(tournaments).where(eq(tournaments.slug, DEFAULT_SLUG)).limit(1);
+    if (!tournament[0]) return [];
+    return db.select().from(groups).where(eq(groups.tournamentId, tournament[0].id)).orderBy(asc(groups.letter));
   }
 
   @Public()
